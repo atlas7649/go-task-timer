@@ -20,7 +20,7 @@ func formatDuration(d time.Duration) string {
 	return fmt.Sprintf("%ds", s)
 }
 
-func StartTask(name string, s *storage.Storage) {
+func StartTask(name string, tag string, s *storage.Storage) {
 	if s.ActiveTask != nil {
 		fmt.Printf("Task '%s' is already running. Stop it first.\n", s.ActiveTask.Name)
 		return
@@ -29,6 +29,7 @@ func StartTask(name string, s *storage.Storage) {
 	now := time.Now()
 	s.ActiveTask = &storage.Task{
 		Name:      name,
+		Tag:       tag,
 		StartTime: now,
 	}
 	s.Accumulated = 0
@@ -146,18 +147,22 @@ func PrintSummary(s *storage.Storage, filterName string) {
 	}
 }
 
-func PrintReport(s *storage.Storage) {
+func PrintReport(s *storage.Storage, filterTag string) {
 	totals := make(map[string]time.Duration)
 	for _, t := range s.CompletedTasks {
-		totals[t.Name] += t.Duration
+		if filterTag == "" || t.Tag == filterTag {
+			totals[t.Name] += t.Duration
+		}
 	}
 
 	if s.ActiveTask != nil {
-		activeDuration := s.Accumulated
-		if s.PausedAt == nil {
-			activeDuration += time.Since(s.ActiveTask.StartTime)
+		if filterTag == "" || s.ActiveTask.Tag == filterTag {
+			activeDuration := s.Accumulated
+			if s.PausedAt == nil {
+				activeDuration += time.Since(s.ActiveTask.StartTime)
+			}
+			totals[s.ActiveTask.Name] += activeDuration
 		}
-		totals[s.ActiveTask.Name] += activeDuration
 	}
 
 	type taskTime struct {
@@ -175,6 +180,9 @@ func PrintReport(s *storage.Storage) {
 	})
 
 	fmt.Println("Time Report (by Task):")
+	if filterTag != "" {
+		fmt.Printf("Filter Tag: %s\n", filterTag)
+	}
 	fmt.Println("--------------------------")
 	for _, tt := range sorted {
 		fmt.Printf("%-20s %s\n", tt.name, formatDuration(tt.time))
