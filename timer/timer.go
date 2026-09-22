@@ -49,15 +49,27 @@ func ListTasks(s *storage.Storage) {
 	}
 }
 
-func PrintSummary(s *storage.Storage) {
+func PrintSummary(s *storage.Storage, filterName string) {
 	var total time.Duration
+	var count int
+
 	for _, t := range s.CompletedTasks {
-		total += t.Duration
+		if filterName == "" || t.Name == filterName {
+			total += t.Duration
+			count++
+		}
 	}
 
-	fmt.Printf("Total time spent across %d completed tasks: %v\n", len(s.CompletedTasks), total)
+	if filterName != "" {
+		fmt.Printf("Total time spent on task '%s': %v (across %d sessions)\n", filterName, total, count)
+	} else {
+		fmt.Printf("Total time spent across %d completed tasks: %v\n", len(s.CompletedTasks), total)
+	}
+
 	if s.ActiveTask != nil {
-		fmt.Printf("Currently active task: %s (since %s)\n", s.ActiveTask.Name, s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
+		if filterName == "" || s.ActiveTask.Name == filterName {
+			fmt.Printf("Currently active task: %s (since %s)\n", s.ActiveTask.Name, s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
+		}
 	}
 }
 
