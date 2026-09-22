@@ -97,11 +97,20 @@ func StopTask(s *storage.Storage) {
 
 func ListTasks(s *storage.Storage) {
 	fmt.Println("Completed Tasks:")
+
+	// Sort tasks by start time descending (most recent first)
+	sort.Slice(s.CompletedTasks, func(i, j int) bool {
+		return s.CompletedTasks[i].StartTime.After(s.CompletedTasks[j].StartTime)
+	})
+
 	for _, t := range s.CompletedTasks {
 		fmt.Printf("- %s: %s (Started: %s)\n", t.Name, formatDuration(t.Duration), t.StartTime.Format("2006-01-02 15:04"))
 	}
+
+	fmt.Printf("\nTotal completed tasks: %d\n", len(s.CompletedTasks))
+
 	if s.ActiveTask != nil {
-		fmt.Printf("\nActive Task: %s (Started: %s)\n", s.ActiveTask.Name, s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
+		fmt.Printf("Active Task: %s (Started: %s)\n", s.ActiveTask.Name, s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
 	}
 }
 
