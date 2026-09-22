@@ -48,3 +48,15 @@ func ListTasks(s *storage.Storage) {
 		fmt.Printf("\nActive Task: %s (Started: %s)\n", s.ActiveTask.Name, s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
 	}
 }
+
+func PrintSummary(s *storage.Storage) {
+	var total time.Duration
+	for _, t := range s.CompletedTasks {
+		total += t.Duration
+	}
+
+	fmt.Printf("Total time spent across %d completed tasks: %v\n", len(s.CompletedTasks), total)
+	if s.ActiveTask != nil {
+		fmt.Printf("Currently active task: %s (since %s)\n", s.ActiveTask.Name, s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
+	}
+}
