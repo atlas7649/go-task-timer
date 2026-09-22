@@ -51,7 +51,7 @@ func PauseTask(s *storage.Storage) {
 	s.Accumulated += now.Sub(s.ActiveTask.StartTime)
 	s.PausedAt = &now
 	s.Save()
-	fmt.Printf("Paused task '%s'. Current accumulated time: %v\n", s.ActiveTask.Name, s.Accumulated)
+	fmt.Printf("Paused task '%s'. Current accumulated time: %s\n", s.ActiveTask.Name, formatDuration(s.Accumulated))
 }
 
 func ResumeTask(s *storage.Storage) {
@@ -92,7 +92,7 @@ func StopTask(s *storage.Storage) {
 	s.PausedAt = nil
 	s.Accumulated = 0
 	s.Save()
-	fmt.Printf("Stopped task '%s'. Total Duration: %v\n", task.Name, duration)
+	fmt.Printf("Stopped task '%s'. Total Duration: %s\n", task.Name, formatDuration(duration))
 }
 
 func ListTasks(s *storage.Storage) {
