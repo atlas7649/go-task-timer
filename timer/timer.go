@@ -104,12 +104,12 @@ func ListTasks(s *storage.Storage) {
 		return s.CompletedTasks[i].StartTime.After(s.CompletedTasks[j].StartTime)
 	})
 
-	for _, t := range s.CompletedTasks {
+	for i, t := range s.CompletedTasks {
 		tagStr := ""
 		if t.Tag != "" {
 			tagStr = fmt.Sprintf(" [%s]", t.Tag)
 		}
-		fmt.Printf("- %s%s: %s (Started: %s)\n", t.Name, tagStr, formatDuration(t.Duration), t.StartTime.Format("2006-01-02 15:04"))
+		fmt.Printf("%d: %s%s: %s (Started: %s)\n", i, t.Name, tagStr, formatDuration(t.Duration), t.StartTime.Format("2006-01-02 15:04"))
 	}
 
 	fmt.Printf("\nTotal completed tasks: %d\n", len(s.CompletedTasks))
@@ -199,6 +199,18 @@ func ClearTasks(s *storage.Storage) {
 	s.CompletedTasks = []storage.Task{}
 	s.Save()
 	fmt.Println("Task history cleared.")
+}
+
+func DeleteTask(index int, s *storage.Storage) {
+	if index < 0 || index >= len(s.CompletedTasks) {
+		fmt.Println("Invalid task index.")
+		return
+	}
+
+	taskName := s.CompletedTasks[index].Name
+	s.CompletedTasks = append(s.CompletedTasks[:index], s.CompletedTasks[index+1:]...)
+	s.Save()
+	fmt.Printf("Deleted task '%s' at index %d.\n", taskName, index)
 }
 
 func PrintStatus(s *storage.Storage) {

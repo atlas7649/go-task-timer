@@ -9,7 +9,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | summary [name] | report [tag] | clear | status]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | summary [name] | report [tag] | clear | status | delete <index>]")
 		os.Exit(1)
 	}
 
@@ -52,6 +52,18 @@ func main() {
 		timer.ClearTasks(store)
 	case "status":
 		timer.PrintStatus(store)
+	case "delete":
+		if len(os.Args) < 3 {
+			fmt.Println("Please provide the task index to delete.")
+			return
+		}
+		var index int
+		_, err := fmt.Sscanf(os.Args[2], "%d", &index)
+		if err != nil {
+			fmt.Println("Invalid index provided.")
+			return
+		}
+		timer.DeleteTask(index, store)
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 	}
