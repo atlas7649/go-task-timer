@@ -60,3 +60,10 @@ func PrintSummary(s *storage.Storage) {
 		fmt.Printf("Currently active task: %s (since %s)\n", s.ActiveTask.Name, s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
 	}
 }
+
+func ClearTasks(s *storage.Storage) {
+	s.ActiveTask = nil
+	s.CompletedTasks = []storage.Task{}
+	s.Save()
+	fmt.Println("Task history cleared.")
+}

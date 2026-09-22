@@ -9,7 +9,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> | stop | list | summary]")
+		fmt.Println("Usage: task-timer [start <name> | stop | list | summary | clear]")
 		os.Exit(1)
 	}
 
@@ -30,6 +30,8 @@ func main() {
 		timer.ListTasks(store)
 	case "summary":
 		timer.PrintSummary(store)
+	case "clear":
+		timer.ClearTasks(store)
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 	}
