@@ -2,6 +2,7 @@ package timer
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"time"
 	"github.com/atlas7649/go-task-timer/storage"
@@ -148,6 +149,10 @@ func PrintSummary(s *storage.Storage, filterName string) {
 }
 
 func PrintReport(s *storage.Storage, filterTag string) {
+	fmt.Print(generateReport(s, filterTag))
+}
+
+func generateReport(s *storage.Storage, filterTag string) string {
 	totals := make(map[string]time.Duration)
 	for _, t := range s.CompletedTasks {
 		if filterTag == "" || t.Tag == filterTag {
@@ -179,17 +184,28 @@ func PrintReport(s *storage.Storage, filterTag string) {
 		return sorted[i].time > sorted[j].time
 	})
 
-	fmt.Println("Time Report (by Task):")
+	report := "Time Report (by Task):\n"
 	if filterTag != "" {
-		fmt.Printf("Filter Tag: %s\n", filterTag)
+		report += fmt.Sprintf("Filter Tag: %s\n", filterTag)
 	}
-	fmt.Println("--------------------------")
+	report += "--------------------------\n"
 	for _, tt := range sorted {
-		fmt.Printf("%-20s %s\n", tt.name, formatDuration(tt.time))
+		report += fmt.Sprintf("%-20s %s\n", tt.name, formatDuration(tt.time))
 	}
 	if len(sorted) == 0 {
-		fmt.Println("No tasks to report.")
+		report += "No tasks to report.\n"
 	}
+	return report
+}
+
+func ExportReport(s *storage.Storage, filename string, filterTag string) {
+	report := generateReport(s, filterTag)
+	err := os.WriteFile(filename, []byte(report), 0644)
+	if err != nil {
+		fmt.Printf("Error exporting report: %v\n", err)
+		return
+	}
+	fmt.Printf("Report successfully exported to %s\n", filename)
 }
 
 func ClearTasks(s *storage.Storage) {

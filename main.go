@@ -9,7 +9,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | summary [name] | report [tag] | clear | status | delete <index>]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | summary [name] | report [tag] | export <filename> [tag] | clear | status | delete <index>]")
 		os.Exit(1)
 	}
 
@@ -48,6 +48,17 @@ func main() {
 			tag = os.Args[2]
 		}
 		timer.PrintReport(store, tag)
+	case "export":
+		if len(os.Args) < 3 {
+			fmt.Println("Please provide a filename to export to.")
+			return
+		}
+		filename := os.Args[2]
+		var tag string
+		if len(os.Args) >= 4 {
+			tag = os.Args[3]
+		}
+		timer.ExportReport(store, filename, tag)
 	case "clear":
 		timer.ClearTasks(store)
 	case "status":
