@@ -7,6 +7,19 @@ import (
 	"github.com/atlas7649/go-task-timer/storage"
 )
 
+func formatDuration(d time.Duration) string {
+	h := int(d.Hours())
+	m := int(d.Minutes()) % 60
+	s := int(d.Seconds()) % 60
+	if h > 0 {
+		return fmt.Sprintf("%dh %dm %ds", h, m, s)
+	}
+	if m > 0 {
+		return fmt.Sprintf("%dm %ds", m, s)
+	}
+	return fmt.Sprintf("%ds", s)
+}
+
 func StartTask(name string, s *storage.Storage) {
 	if s.ActiveTask != nil {
 		fmt.Printf("Task '%s' is already running. Stop it first.\n", s.ActiveTask.Name)
@@ -85,7 +98,7 @@ func StopTask(s *storage.Storage) {
 func ListTasks(s *storage.Storage) {
 	fmt.Println("Completed Tasks:")
 	for _, t := range s.CompletedTasks {
-		fmt.Printf("- %s: %v (Started: %s)\n", t.Name, t.Duration, t.StartTime.Format("2006-01-02 15:04"))
+		fmt.Printf("- %s: %s (Started: %s)\n", t.Name, formatDuration(t.Duration), t.StartTime.Format("2006-01-02 15:04"))
 	}
 	if s.ActiveTask != nil {
 		fmt.Printf("\nActive Task: %s (Started: %s)\n", s.ActiveTask.Name, s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
@@ -104,9 +117,9 @@ func PrintSummary(s *storage.Storage, filterName string) {
 	}
 
 	if filterName != "" {
-		fmt.Printf("Total time spent on task '%s': %v (across %d sessions)\n", filterName, total, count)
+		fmt.Printf("Total time spent on task '%s': %s (across %d sessions)\n", filterName, formatDuration(total), count)
 	} else {
-		fmt.Printf("Total time spent across %d completed tasks: %v\n", len(s.CompletedTasks), total)
+		fmt.Printf("Total time spent across %d completed tasks: %s\n", len(s.CompletedTasks), formatDuration(total))
 	}
 
 	if s.ActiveTask != nil {
@@ -120,6 +133,14 @@ func PrintReport(s *storage.Storage) {
 	totals := make(map[string]time.Duration)
 	for _, t := range s.CompletedTasks {
 		totals[t.Name] += t.Duration
+	}
+
+	if s.ActiveTask != nil {
+		activeDuration := s.Accumulated
+		if s.PausedAt == nil {
+			activeDuration += time.Since(s.ActiveTask.StartTime)
+		}
+		totals[s.ActiveTask.Name] += activeDuration
 	}
 
 	type taskTime struct {
@@ -139,10 +160,10 @@ func PrintReport(s *storage.Storage) {
 	fmt.Println("Time Report (by Task):")
 	fmt.Println("--------------------------")
 	for _, tt := range sorted {
-		fmt.Printf("%-20s %v\n", tt.name, tt.time)
+		fmt.Printf("%-20s %s\n", tt.name, formatDuration(tt.time))
 	}
 	if len(sorted) == 0 {
-		fmt.Println("No completed tasks to report.")
+		fmt.Println("No tasks to report.")
 	}
 }
 
@@ -171,9 +192,9 @@ func PrintStatus(s *storage.Storage) {
 		status = "Paused"
 	}
 
-	fmt.Printf("Current task: %s [%s]\nStarted: %s\nElapsed time: %v\n", 
+	fmt.Printf("Current task: %s [%s]\nStarted: %s\nElapsed time: %s\n", 
 		s.ActiveTask.Name, 
 		status,
 		s.ActiveTask.StartTime.Format("2006-01-02 15:04"), 
-		elapsed)
+		formatDuration(elapsed))
 }
