@@ -18,8 +18,44 @@ func StartTask(name string, s *storage.Storage) {
 		Name:      name,
 		StartTime: now,
 	}
+	s.Accumulated = 0
+	s.PausedAt = nil
 	s.Save()
 	fmt.Printf("Started tracking task: %s at %s\n", name, now.Format(time.Kitchen))
+}
+
+func PauseTask(s *storage.Storage) {
+	if s.ActiveTask == nil {
+		fmt.Println("No active task to pause.")
+		return
+	}
+	if s.PausedAt != nil {
+		fmt.Println("Task is already paused.")
+		return
+	}
+
+	now := time.Now()
+	s.Accumulated += now.Sub(s.ActiveTask.StartTime)
+	s.PausedAt = &now
+	s.Save()
+	fmt.Printf("Paused task '%s'. Current accumulated time: %v\n", s.ActiveTask.Name, s.Accumulated)
+}
+
+func ResumeTask(s *storage.Storage) {
+	if s.ActiveTask == nil {
+		fmt.Println("No active task to resume.")
+		return
+	}
+	if s.PausedAt == nil {
+		fmt.Println("Task is not paused.")
+		return
+	}
+
+	now := time.Now()
+	s.ActiveTask.StartTime = now
+	s.PausedAt = nil
+	s.Save()
+	fmt.Printf("Resumed task '%s' at %s\n", s.ActiveTask.Name, now.Format(time.Kitchen))
 }
 
 func StopTask(s *storage.Storage) {
@@ -29,15 +65,21 @@ func StopTask(s *storage.Storage) {
 	}
 
 	now := time.Now()
-	duration := now.Sub(s.ActiveTask.StartTime)
+	duration := s.Accumulated
+	if s.PausedAt == nil {
+		duration += now.Sub(s.ActiveTask.StartTime)
+	}
+
 	task := *s.ActiveTask
 	task.EndTime = now
 	task.Duration = duration
 
 	s.CompletedTasks = append(s.CompletedTasks, task)
 	s.ActiveTask = nil
+	s.PausedAt = nil
+	s.Accumulated = 0
 	s.Save()
-	fmt.Printf("Stopped task '%s'. Duration: %v\n", task.Name, duration)
+	fmt.Printf("Stopped task '%s'. Total Duration: %v\n", task.Name, duration)
 }
 
 func ListTasks(s *storage.Storage) {
@@ -106,6 +148,8 @@ func PrintReport(s *storage.Storage) {
 
 func ClearTasks(s *storage.Storage) {
 	s.ActiveTask = nil
+	s.PausedAt = nil
+	s.Accumulated = 0
 	s.CompletedTasks = []storage.Task{}
 	s.Save()
 	fmt.Println("Task history cleared.")
@@ -117,9 +161,19 @@ func PrintStatus(s *storage.Storage) {
 		return
 	}
 
-	elapsed := time.Since(s.ActiveTask.StartTime)
-	fmt.Printf("Current task: %s\nStarted: %s\nElapsed time: %v\n", 
+	elapsed := s.Accumulated
+	if s.PausedAt == nil {
+		elapsed += time.Since(s.ActiveTask.StartTime)
+	}
+
+	status := "Running"
+	if s.PausedAt != nil {
+		status = "Paused"
+	}
+
+	fmt.Printf("Current task: %s [%s]\nStarted: %s\nElapsed time: %v\n", 
 		s.ActiveTask.Name, 
+		status,
 		s.ActiveTask.StartTime.Format("2006-01-02 15:04"), 
 		elapsed)
 }

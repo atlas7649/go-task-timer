@@ -16,6 +16,8 @@ type Task struct {
 type Storage struct {
 	FilePath       string    `json:"-"`
 	ActiveTask     *Task     `json:"active_task"`
+	PausedAt       *time.Time `json:"paused_at,omitempty"`
+	Accumulated    time.Duration `json:"accumulated,omitempty"`
 	CompletedTasks []Task    `json:"completed_tasks"`
 }
 
