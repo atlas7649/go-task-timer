@@ -2,6 +2,7 @@ package timer
 
 import (
 	"fmt"
+	"sort"
 	"time"
 	"github.com/atlas7649/go-task-timer/storage"
 )
@@ -70,6 +71,36 @@ func PrintSummary(s *storage.Storage, filterName string) {
 		if filterName == "" || s.ActiveTask.Name == filterName {
 			fmt.Printf("Currently active task: %s (since %s)\n", s.ActiveTask.Name, s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
 		}
+	}
+}
+
+func PrintReport(s *storage.Storage) {
+	totals := make(map[string]time.Duration)
+	for _, t := range s.CompletedTasks {
+		totals[t.Name] += t.Duration
+	}
+
+	type taskTime struct {
+		name string
+		time time.Duration
+	}
+
+	var sorted []taskTime
+	for name, duration := range totals {
+		sorted = append(sorted, taskTime{name, duration})
+	}
+
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].time > sorted[j].time
+	})
+
+	fmt.Println("Time Report (by Task):")
+	fmt.Println("--------------------------")
+	for _, tt := range sorted {
+		fmt.Printf("%-20s %v\n", tt.name, tt.time)
+	}
+	if len(sorted) == 0 {
+		fmt.Println("No completed tasks to report.")
 	}
 }
 
