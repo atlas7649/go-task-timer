@@ -104,13 +104,21 @@ func ListTasks(s *storage.Storage) {
 	})
 
 	for _, t := range s.CompletedTasks {
-		fmt.Printf("- %s: %s (Started: %s)\n", t.Name, formatDuration(t.Duration), t.StartTime.Format("2006-01-02 15:04"))
+		tagStr := ""
+		if t.Tag != "" {
+			tagStr = fmt.Sprintf(" [%s]", t.Tag)
+		}
+		fmt.Printf("- %s%s: %s (Started: %s)\n", t.Name, tagStr, formatDuration(t.Duration), t.StartTime.Format("2006-01-02 15:04"))
 	}
 
 	fmt.Printf("\nTotal completed tasks: %d\n", len(s.CompletedTasks))
 
 	if s.ActiveTask != nil {
-		fmt.Printf("Active Task: %s (Started: %s)\n", s.ActiveTask.Name, s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
+		tagStr := ""
+		if s.ActiveTask.Tag != "" {
+			tagStr = fmt.Sprintf(" [%s]", s.ActiveTask.Tag)
+		}
+		fmt.Printf("Active Task: %s%s (Started: %s)\n", s.ActiveTask.Name, tagStr, s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
 	}
 }
 

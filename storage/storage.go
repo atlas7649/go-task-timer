@@ -8,6 +8,7 @@ import (
 
 type Task struct {
 	Name      string        `json:"name"`
+	Tag       string        `json:"tag,omitempty"`
 	StartTime time.Time     `json:"start_time"`
 	EndTime   time.Time     `json:"end_time,omitempty"`
 	Duration  time.Duration `json:"duration,omitempty"`
