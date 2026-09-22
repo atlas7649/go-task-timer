@@ -79,3 +79,16 @@ func ClearTasks(s *storage.Storage) {
 	s.Save()
 	fmt.Println("Task history cleared.")
 }
+
+func PrintStatus(s *storage.Storage) {
+	if s.ActiveTask == nil {
+		fmt.Println("No task is currently running.")
+		return
+	}
+
+	elapsed := time.Since(s.ActiveTask.StartTime)
+	fmt.Printf("Current task: %s\nStarted: %s\nElapsed time: %v\n", 
+		s.ActiveTask.Name, 
+		s.ActiveTask.StartTime.Format("2006-01-02 15:04"), 
+		elapsed)
+}
