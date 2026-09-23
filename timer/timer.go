@@ -130,6 +130,37 @@ func ListTasks(s *storage.Storage) {
 	}
 }
 
+func ListTasksByTag(filterTag string, s *storage.Storage) {
+	var filtered []storage.Task
+	for _, t := range s.CompletedTasks {
+		if t.Tag == filterTag {
+			filtered = append(filtered, t)
+		}
+	}
+
+	fmt.Printf("Tasks tagged with '%s':\n", filterTag)
+	fmt.Println("--------------------------")
+	sort.Slice(filtered, func(i, j int) bool {
+		return filtered[i].StartTime.After(filtered[j].StartTime)
+	})
+
+	for i, t := range filtered {
+		fmt.Printf("%d: %s: %s (Started: %s)\n", i, t.Name, formatDuration(t.Duration), t.StartTime.Format("2006-01-02 15:04"))
+	}
+
+	if len(filtered) == 0 {
+		fmt.Println("No completed tasks found with this tag.")
+	}
+
+	if s.ActiveTask != nil && s.ActiveTask.Tag == filterTag {
+		elapsed := s.Accumulated
+		if s.PausedAt == nil {
+			elapsed += time.Since(s.ActiveTask.StartTime)
+		}
+		fmt.Printf("Active Task: %s - %s (Started: %s)\n", s.ActiveTask.Name, formatDuration(elapsed), s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
+	}
+}
+
 func PrintSummary(s *storage.Storage, filterName string) {
 	var total time.Duration
 	var count int

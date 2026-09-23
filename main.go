@@ -9,7 +9,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | summary [name] | report [tag] | export <filename> [tag] | clear | reset | status | delete <index> | top | search <query> | stats]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | summary [name] | report [tag] | export <filename> [tag] | clear | reset | status | delete <index> | top | search <query> | stats | tag <tag>]")
 		os.Exit(1)
 	}
 
@@ -87,6 +87,12 @@ func main() {
 		timer.SearchTasks(os.Args[2], store)
 	case "stats":
 		timer.PrintStats(store)
+	case "tag":
+		if len(os.Args) < 3 {
+			fmt.Println("Please provide a tag to list tasks for.")
+			return
+		}
+		timer.ListTasksByTag(os.Args[2], store)
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 	}
