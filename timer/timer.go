@@ -121,7 +121,12 @@ func ListTasks(s *storage.Storage) {
 		if s.ActiveTask.Tag != "" {
 			tagStr = fmt.Sprintf(" [%s]", s.ActiveTask.Tag)
 		}
-		fmt.Printf("Active Task: %s%s (Started: %s)\n", s.ActiveTask.Name, tagStr, s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
+
+		elapsed := s.Accumulated
+		if s.PausedAt == nil {
+			elapsed += time.Since(s.ActiveTask.StartTime)
+		}
+		fmt.Printf("Active Task: %s%s - %s (Started: %s)\n", s.ActiveTask.Name, tagStr, formatDuration(elapsed), s.ActiveTask.StartTime.Format("2006-01-02 15:04"))
 	}
 }
 
@@ -216,6 +221,19 @@ func ClearTasks(s *storage.Storage) {
 	s.CompletedTasks = []storage.Task{}
 	s.Save()
 	fmt.Println("Task history cleared.")
+}
+
+func ResetActiveTask(s *storage.Storage) {
+	if s.ActiveTask == nil {
+		fmt.Println("No active task to reset.")
+		return
+	}
+	name := s.ActiveTask.Name
+	s.ActiveTask = nil
+	s.PausedAt = nil
+	s.Accumulated = 0
+	s.Save()
+	fmt.Printf("Reset active task '%s'. Time not saved to history.\n", name)
 }
 
 func DeleteTask(index int, s *storage.Storage) {

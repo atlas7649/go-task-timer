@@ -9,7 +9,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | summary [name] | report [tag] | export <filename> [tag] | clear | status | delete <index> | top | search <query> | stats]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | summary [name] | report [tag] | export <filename> [tag] | clear | reset | status | delete <index> | top | search <query> | stats]")
 		os.Exit(1)
 	}
 
@@ -61,6 +61,8 @@ func main() {
 		timer.ExportReport(store, filename, tag)
 	case "clear":
 		timer.ClearTasks(store)
+	case "reset":
+		timer.ResetActiveTask(store)
 	case "status":
 		timer.PrintStatus(store)
 	case "delete":
