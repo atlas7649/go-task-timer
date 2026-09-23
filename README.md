@@ -13,3 +13,5 @@ A simple CLI tool to track time spent on various tasks.
 - `go run main.go summary [name]` - Show total time for a specific task
 - `go run main.go report` - Show cumulative time per task
 - `go run main.go clear` - Clear all task history
+- `go run main.go goal "My Project" 2h` - Set a time goal for a task
+- `go run main.go goals` - Show progress on all goals

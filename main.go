@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 	"github.com/atlas7649/go-task-timer/storage"
 	"github.com/atlas7649/go-task-timer/timer"
 )
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | summary [name] | report [tag] | export <filename> [tag] | clear | reset | status | delete <index> | top | search <query> | stats | tag <tag>]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | summary [name] | report [tag] | export <filename> [tag] | clear | reset | status | delete <index> | top | search <query> | stats | tag <tag> | goal <name> <duration> | goals]")
 		os.Exit(1)
 	}
 
@@ -93,7 +94,54 @@ func main() {
 			return
 		}
 		timer.ListTasksByTag(os.Args[2], store)
+	case "goal":
+		if len(os.Args) < 4 {
+			fmt.Println("Usage: goal <name> <duration> (e.g., goal 'Coding' 2h)")
+			return
+		}
+		name := os.Args[2]
+		durationStr := os.Args[3]
+		dur, err := parseDuration(durationStr)
+		if err != nil {
+			fmt.Printf("Invalid duration: %v\n", err)
+			return
+		}
+		timer.SetGoal(name, dur, store)
+	case "goals":
+		timer.PrintGoals(store)
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 	}
 }
+
+func parseDuration(s string) (time.Duration, error) {
+	s = strings.ToLower(s)
+	if strings.HasSuffix(s, "h") {
+		var h int
+		_, err := fmt.Sscanf(s, "%dh", &h)
+		if err != nil {
+			return 0, err
+		}
+		return time.Duration(h) * time.Hour, nil
+	}
+	if strings.HasSuffix(s, "m") {
+		var m int
+		_, err := fmt.Sscanf(s, "%dm", &m)
+		if err != nil {
+			return 0, err
+		}
+		return time.Duration(m) * time.Minute, nil
+	}
+	if strings.HasSuffix(s, "s") {
+		var sVal int
+		_, err := fmt.Sscanf(s, "%ds", &sVal)
+		if err != nil {
+			return 0, err
+		}
+		return time.Duration(sVal) * time.Second, nil
+	}
+	return time.ParseDuration(s)
+}
+
+// Required imports for parseDuration
+import "strings"

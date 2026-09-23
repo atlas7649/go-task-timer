@@ -250,8 +250,9 @@ func ClearTasks(s *storage.Storage) {
 	s.PausedAt = nil
 	s.Accumulated = 0
 	s.CompletedTasks = []storage.Task{}
+	s.Goals = []storage.Goal{}
 	s.Save()
-	fmt.Println("Task history cleared.")
+	fmt.Println("Task history and goals cleared.")
 }
 
 func ResetActiveTask(s *storage.Storage) {
@@ -401,5 +402,49 @@ func PrintStats(s *storage.Storage) {
 		fmt.Println("Current Status:        Task currently active")
 	} else {
 		fmt.Println("Current Status:        Idle")
+	}
+}
+
+func SetGoal(name string, duration time.Duration, s *storage.Storage) {
+	for i, g := range s.Goals {
+		if g.TaskName == name {
+			s.Goals[i].TargetTime = duration
+			s.Save()
+			fmt.Printf("Updated goal for '%s' to %s\n", name, formatDuration(duration))
+			return
+		}
+	}
+	s.Goals = append(s.Goals, storage.Goal{TaskName: name, TargetTime: duration})
+	s.Save()
+	fmt.Printf("Set goal for '%s' to %s\n", name, formatDuration(duration))
+}
+
+func PrintGoals(s *storage.Storage) {
+	fmt.Println("Task Goals & Progress:")
+	fmt.Println("--------------------------")
+	totals := make(map[string]time.Duration)
+	for _, t := range s.CompletedTasks {
+		totals[t.Name] += t.Duration
+	}
+	if s.ActiveTask != nil {
+		activeDuration := s.Accumulated
+		if s.PausedAt == nil {
+			activeDuration += time.Since(s.ActiveTask.StartTime)
+		}
+		totals[s.ActiveTask.Name] += activeDuration
+	}
+
+	if len(s.Goals) == 0 {
+		fmt.Println("No goals set.")
+		return
+	}
+
+	for _, g := range s.Goals {
+		current := totals[g.TaskName]
+		percent := 0.0
+		if g.TargetTime > 0 {
+			percent = float64(current) / float64(g.TargetTime) * 100
+		}
+		fmt.Printf("%-20s: %s / %s (%.1f%%)\n", g.TaskName, formatDuration(current), formatDuration(g.TargetTime), percent)
 	}
 }
