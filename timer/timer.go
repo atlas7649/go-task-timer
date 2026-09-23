@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 	"time"
 	"github.com/atlas7649/go-task-timer/storage"
 )
@@ -293,5 +294,31 @@ func PrintTopTasks(s *storage.Storage) {
 
 	if len(sorted) == 0 {
 		fmt.Println("No tasks recorded yet.")
+	}
+}
+
+func SearchTasks(query string, s *storage.Storage) {
+	query = strings.ToLower(query)
+	var results []storage.Task
+
+	for _, t := range s.CompletedTasks {
+		if strings.Contains(strings.ToLower(t.Name), query) || strings.Contains(strings.ToLower(t.Tag), query) {
+			results = append(results, t)
+		}
+	}
+
+	if len(results) == 0 {
+		fmt.Printf("No tasks found matching query: %s\n", query)
+		return
+	}
+
+	fmt.Printf("Found %d tasks matching '%s':\n", len(results), query)
+	fmt.Println("--------------------------")
+	for i, t := range results {
+		tagStr := ""
+		if t.Tag != "" {
+			tagStr = fmt.Sprintf(" [%s]", t.Tag)
+		}
+		fmt.Printf("%d: %s%s: %s (Duration: %s)\n", i, t.Name, tagStr, t.StartTime.Format("2006-01-02"), formatDuration(t.Duration))
 	}
 }
