@@ -322,3 +322,35 @@ func SearchTasks(query string, s *storage.Storage) {
 		fmt.Printf("%d: %s%s: %s (Duration: %s)\n", i, t.Name, tagStr, t.StartTime.Format("2006-01-02"), formatDuration(t.Duration))
 	}
 }
+
+func PrintStats(s *storage.Storage) {
+	var totalDuration time.Duration
+	count := len(s.CompletedTasks)
+
+	for _, t := range s.CompletedTasks {
+		totalDuration += t.Duration
+	}
+
+	if s.ActiveTask != nil {
+		activeDuration := s.Accumulated
+		if s.PausedAt == nil {
+			activeDuration += time.Since(s.ActiveTask.StartTime)
+		}
+		totalDuration += activeDuration
+	}
+
+	fmt.Println("Overall Statistics:")
+	fmt.Println("--------------------------")
+	fmt.Printf("Total Tasks Completed: %d\n", count)
+	fmt.Printf("Total Time Tracked:   %s\n", formatDuration(totalDuration))
+
+	if count > 0 {
+		avg := totalDuration / time.Duration(count)
+		fmt.Printf("Average Task Duration: %s\n", formatDuration(avg))
+	}
+	if s.ActiveTask != nil {
+		fmt.Println("Current Status:        Task currently active")
+	} else {
+		fmt.Println("Current Status:        Idle")
+	}
+}
