@@ -9,7 +9,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | summary [name] | report [tag] | export <filename> [tag] | clear | status | delete <index>]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | summary [name] | report [tag] | export <filename> [tag] | clear | status | delete <index> | top]")
 		os.Exit(1)
 	}
 
@@ -75,6 +75,8 @@ func main() {
 			return
 		}
 		timer.DeleteTask(index, store)
+	case "top":
+		timer.PrintTopTasks(store)
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 	}

@@ -251,3 +251,47 @@ func PrintStatus(s *storage.Storage) {
 		s.ActiveTask.StartTime.Format("2006-01-02 15:04"), 
 		formatDuration(elapsed))
 }
+
+func PrintTopTasks(s *storage.Storage) {
+	totals := make(map[string]time.Duration)
+	for _, t := range s.CompletedTasks {
+		totals[t.Name] += t.Duration
+	}
+
+	if s.ActiveTask != nil {
+		activeDuration := s.Accumulated
+		if s.PausedAt == nil {
+			activeDuration += time.Since(s.ActiveTask.StartTime)
+		}
+		totals[s.ActiveTask.Name] += activeDuration
+	}
+
+	type taskTime struct {
+		name string
+		time time.Duration
+	}
+
+	var sorted []taskTime
+	for name, duration := range totals {
+		sorted = append(sorted, taskTime{name, duration})
+	}
+
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].time > sorted[j].time
+	})
+
+	fmt.Println("Top 5 Tasks by Duration:")
+	fmt.Println("--------------------------")
+	limit := 5
+	if len(sorted) < limit {
+		limit = len(sorted)
+	}
+
+	for i := 0; i < limit; i++ {
+		fmt.Printf("%d. %-20s %s\n", i+1, sorted[i].name, formatDuration(sorted[i].time))
+	}
+
+	if len(sorted) == 0 {
+		fmt.Println("No tasks recorded yet.")
+	}
+}
