@@ -130,6 +130,50 @@ func ListTasks(s *storage.Storage) {
 	}
 }
 
+func PrintLog(s *storage.Storage) {
+	fmt.Println("Task Log (Chronological History):")
+	fmt.Println("------------------------------------------------------------------")
+
+	// Create a copy for sorting to avoid affecting storage order
+	var allTasks []storage.Task
+	allTasks = append(allTasks, s.CompletedTasks...)
+
+	if s.ActiveTask != nil {
+		activeTask := *s.ActiveTask
+		elapsed := s.Accumulated
+		if s.PausedAt == nil {
+			elapsed += time.Since(s.ActiveTask.StartTime)
+		}
+		activeTask.Duration = elapsed
+		allTasks = append(allTasks, activeTask)
+	}
+
+	sort.Slice(allTasks, func(i, j int) bool {
+		return allTasks[i].StartTime.Before(allTasks[j].StartTime)
+	})
+
+	for _, t := range allTasks {
+		tagStr := ""
+		if t.Tag != "" {
+			tagStr = fmt.Sprintf(" [%s]", t.Tag)
+		}
+		status := "Completed"
+		if t.EndTime.IsZero() {
+			status = "Active"
+		}
+		fmt.Printf("%s | %-15s%s | Duration: %-12s | Status: %s\n", 
+			t.StartTime.Format("2006-01-02 15:04"), 
+			t.Name, 
+			tagStr, 
+			formatDuration(t.Duration), 
+			status)
+	}
+
+	if len(allTasks) == 0 {
+		fmt.Println("No task history found.")
+	}
+}
+
 func ListTasksByTag(filterTag string, s *storage.Storage) {
 	var filtered []storage.Task
 	for _, t := range s.CompletedTasks {

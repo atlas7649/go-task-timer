@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 	"github.com/atlas7649/go-task-timer/storage"
 	"github.com/atlas7649/go-task-timer/timer"
@@ -10,7 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | summary [name] | report [tag] | export <filename> [tag] | clear | reset | status | delete <index> | top | search <query> | stats | tag <tag> | goal <name> <duration> | goals]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | clear | reset | status | delete <index> | top | search <query> | stats | tag <tag> | goal <name> <duration> | goals]")
 		os.Exit(1)
 	}
 
@@ -37,6 +38,8 @@ func main() {
 		timer.StopTask(store)
 	case "list":
 		timer.ListTasks(store)
+	case "log":
+		timer.PrintLog(store)
 	case "summary":
 		var name string
 		if len(os.Args) >= 3 {
@@ -142,6 +145,3 @@ func parseDuration(s string) (time.Duration, error) {
 	}
 	return time.ParseDuration(s)
 }
-
-// Required imports for parseDuration
-import "strings"
