@@ -11,7 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | clear | reset | status | delete <index> | top | top-tag | search <query> | stats | tag <tag> | goal <name> <duration> | goals | rm-goal <name>]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | clear | reset | status | delete <index> | top | top-tag | search <query> | stats | tag <tag> | goal <name> <duration> | goals | rm-goal <name> | daily]")
 		os.Exit(1)
 	}
 
@@ -131,6 +131,8 @@ func main() {
 			return
 		}
 		timer.RemoveGoal(os.Args[2], store)
+	case "daily":
+		timer.PrintDailyReport(store)
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 	}

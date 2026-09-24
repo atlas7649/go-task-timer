@@ -593,3 +593,56 @@ func PrintGoals(s *storage.Storage) {
 		fmt.Printf("%-20s: %s / %s (%.1f%%)\n", g.TaskName, formatDuration(current), formatDuration(g.TargetTime), percent)
 	}
 }
+
+func PrintDailyReport(s *storage.Storage) {
+	now := time.Now()
+	year, month, day := now.Date()
+
+	totals := make(map[string]time.Duration)
+	var totalDayDuration time.Duration
+
+	for _, t := range s.CompletedTasks {
+		cy, cm, cd := t.StartTime.Date()
+		if cy == year && cm == month && cd == day {
+			totals[t.Name] += t.Duration
+			totalDayDuration += t.Duration
+		}
+	}
+
+	if s.ActiveTask != nil {
+		cy, cm, cd := s.ActiveTask.StartTime.Date()
+		if cy == year && cm == month && cd == day {
+			activeDuration := s.Accumulated
+			if s.PausedAt == nil {
+				activeDuration += time.Since(s.ActiveTask.StartTime)
+			}
+			totals[s.ActiveTask.Name] += activeDuration
+			totalDayDuration += activeDuration
+		}
+	}
+
+	fmt.Printf("Daily Report for %s:\n", now.Format("2006-01-02"))
+	fmt.Println("--------------------------")
+	if len(totals) == 0 {
+		fmt.Println("No tasks tracked today.")
+		return
+	}
+
+	type taskTime struct {
+		name string
+		time time.Duration
+	}
+	var sorted []taskTime
+	for name, duration := range totals {
+		sorted = append(sorted, taskTime{name, duration})
+	}
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].time > sorted[j].time
+	})
+
+	for _, tt := range sorted {
+		fmt.Printf("%-20s %s\n", tt.name, formatDuration(tt.time))
+	}
+	fmt.Println("--------------------------")
+	fmt.Printf("Total for today: %s\n", formatDuration(totalDayDuration))
+}
