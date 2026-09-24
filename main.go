@@ -11,7 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | clear | reset | status | delete <index> | top | search <query> | stats | tag <tag> | goal <name> <duration> | goals | rm-goal <name>]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | clear | reset | status | delete <index> | top | top-tag | search <query> | stats | tag <tag> | goal <name> <duration> | goals | rm-goal <name>]")
 		os.Exit(1)
 	}
 
@@ -83,6 +83,8 @@ func main() {
 		timer.DeleteTask(index, store)
 	case "top":
 		timer.PrintTopTasks(store)
+	case "top-tag":
+		timer.PrintTopTags(store)
 	case "search":
 		if len(os.Args) < 3 {
 			fmt.Println("Please provide a search query.")
