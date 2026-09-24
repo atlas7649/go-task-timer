@@ -463,6 +463,18 @@ func SetGoal(name string, duration time.Duration, s *storage.Storage) {
 	fmt.Printf("Set goal for '%s' to %s\n", name, formatDuration(duration))
 }
 
+func RemoveGoal(name string, s *storage.Storage) {
+	for i, g := range s.Goals {
+		if g.TaskName == name {
+			s.Goals = append(s.Goals[:i], s.Goals[i+1:]...)
+			s.Save()
+			fmt.Printf("Removed goal for task '%s'.\n", name)
+			return
+		}
+	}
+	fmt.Printf("No goal found for task '%s'.\n", name)
+}
+
 func PrintGoals(s *storage.Storage) {
 	fmt.Println("Task Goals & Progress:")
 	fmt.Println("--------------------------")
