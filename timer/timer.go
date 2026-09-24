@@ -1,6 +1,7 @@
 package timer
 
 import (
+	"encoding/csv"
 	"fmt"
 	"os"
 	"sort"
@@ -287,6 +288,48 @@ func ExportReport(s *storage.Storage, filename string, filterTag string) {
 		return
 	}
 	fmt.Printf("Report successfully exported to %s\n", filename)
+}
+
+func ExportCSV(s *storage.Storage, filename string, filterTag string) {
+	file, err := os.Create(filename)
+	if err != nil {
+		fmt.Printf("Error creating CSV file: %v\n", err)
+		return
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	// Header
+	writer.Write([]string{"Task Name", "Tag", "Start Time", "End Time", "Duration"})
+
+	var tasks []storage.Task
+	tasks = append(tasks, s.CompletedTasks...)
+
+	if s.ActiveTask != nil {
+		task := *s.ActiveTask
+		elapsed := s.Accumulated
+		if s.PausedAt == nil {
+			elapsed += time.Since(s.ActiveTask.StartTime)
+		}
+		task.Duration = elapsed
+		tasks = append(tasks, task)
+	}
+
+	for _, t := range tasks {
+		if filterTag == "" || t.Tag == filterTag {
+			writer.Write([]string{
+				t.Name,
+				t.Tag,
+				t.StartTime.Format(time.RFC3339),
+				t.EndTime.Format(time.RFC3339),
+				formatDuration(t.Duration),
+			})
+		}
+	}
+
+	fmt.Printf("CSV report successfully exported to %s\n", filename)
 }
 
 func ClearTasks(s *storage.Storage) {
