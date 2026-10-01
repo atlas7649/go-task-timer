@@ -716,3 +716,44 @@ func PrintWeeklyReport(s *storage.Storage) {
 	fmt.Println("--------------------------")
 	fmt.Printf("Total for the week: %s\n", formatDuration(totalWeekDuration))
 }
+
+func PrintTags(s *storage.Storage) {
+	totals := make(map[string]time.Duration)
+	for _, t := range s.CompletedTasks {
+		if t.Tag != "" {
+			totals[t.Tag] += t.Duration
+		}
+	}
+
+	if s.ActiveTask != nil && s.ActiveTask.Tag != "" {
+		activeDuration := s.Accumulated
+		if s.PausedAt == nil {
+			activeDuration += time.Since(s.ActiveTask.StartTime)
+		}
+		totals[s.ActiveTask.Tag] += activeDuration
+	}
+
+	if len(totals) == 0 {
+		fmt.Println("No tags found in task history.")
+		return
+	}
+
+	type tagTime struct {
+		tag  string
+		time time.Duration
+	}
+	var sorted []tagTime
+	for tag, duration := range totals {
+		sorted = append(sorted, tagTime{tag, duration})
+	}
+
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].tag < sorted[j].tag
+	})
+
+	fmt.Println("Unique Tags & Total Time:")
+	fmt.Println("--------------------------")
+	for _, tt := range sorted {
+		fmt.Printf("%-20s %s\n", tt.tag, formatDuration(tt.time))
+	}
+}

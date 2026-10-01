@@ -11,7 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | clear | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | search <query> | stats | tag <tag> | goal <name> <duration> | goals | rm-goal <name> | daily | weekly]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | clear | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | search <query> | stats | tag <tag> | tags | goal <name> <duration> | goals | rm-goal <name> | daily | weekly]")
 		os.Exit(1)
 	}
 
@@ -122,6 +122,8 @@ func main() {
 			return
 		}
 		timer.ListTasksByTag(os.Args[2], store)
+	case "tags":
+		timer.PrintTags(store)
 	case "goal":
 		if len(os.Args) < 4 {
 			fmt.Println("Usage: goal <name> <duration> (e.g., goal 'Coding' 2h)")
