@@ -646,3 +646,60 @@ func PrintDailyReport(s *storage.Storage) {
 	fmt.Println("--------------------------")
 	fmt.Printf("Total for today: %s\n", formatDuration(totalDayDuration))
 }
+
+func PrintWeeklyReport(s *storage.Storage) {
+	now := time.Now()
+	// Calculate the start of the current week (Monday)
+	offset := int(now.Weekday()) - 1
+	if offset < 0 {
+		offset = 6 // Sunday
+	}
+	weekStart := now.AddDate(0, 0, -offset)
+	weekStart = time.Date(weekStart.Year(), weekStart.Month(), weekStart.Day(), 0, 0, 0, 0, weekStart.Location())
+
+	totals := make(map[string]time.Duration)
+	var totalWeekDuration time.Duration
+
+	for _, t := range s.CompletedTasks {
+		if t.StartTime.After(weekStart) || t.StartTime.Equal(weekStart) {
+			totals[t.Name] += t.Duration
+			totalWeekDuration += t.Duration
+		}
+	}
+
+	if s.ActiveTask != nil {
+		if s.ActiveTask.StartTime.After(weekStart) || s.ActiveTask.StartTime.Equal(weekStart) {
+			activeDuration := s.Accumulated
+			if s.PausedAt == nil {
+				activeDuration += time.Since(s.ActiveTask.StartTime)
+			}
+			totals[s.ActiveTask.Name] += activeDuration
+			totalWeekDuration += activeDuration
+		}
+	}
+
+	fmt.Printf("Weekly Report (starting %s):\n", weekStart.Format("2006-01-02"))
+	fmt.Println("--------------------------")
+	if len(totals) == 0 {
+		fmt.Println("No tasks tracked this week.")
+		return
+	}
+
+	type taskTime struct {
+		name string
+		time time.Duration
+	}
+	var sorted []taskTime
+	for name, duration := range totals {
+		sorted = append(sorted, taskTime{name, duration})
+	}
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].time > sorted[j].time
+	})
+
+	for _, tt := range sorted {
+		fmt.Printf("%-20s %s\n", tt.name, formatDuration(tt.time))
+	}
+	fmt.Println("--------------------------")
+	fmt.Printf("Total for the week: %s\n", formatDuration(totalWeekDuration))
+}
