@@ -11,7 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | clear | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | search <query> | stats | tag <tag> | tags | goal <name> <duration> | goals | rm-goal <name> | daily | weekly | history <start_date> <end_date>]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | clear | clear-goals | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | search <query> | stats | tag <tag> | tags | goal <name> <duration> | goals | rm-goal <name> | daily | weekly | history <start_date> <end_date>]")
 		os.Exit(1)
 	}
 
@@ -76,6 +76,8 @@ func main() {
 		timer.ExportCSV(store, filename, tag)
 	case "clear":
 		timer.ClearTasks(store)
+	case "clear-goals":
+		timer.ClearGoals(store)
 	case "reset":
 		timer.ResetActiveTask(store)
 	case "status":

@@ -342,6 +342,12 @@ func ClearTasks(s *storage.Storage) {
 	fmt.Println("Task history and goals cleared.")
 }
 
+func ClearGoals(s *storage.Storage) {
+	s.Goals = []storage.Goal{}
+	s.Save()
+	fmt.Println("All task goals cleared.")
+}
+
 func ResetActiveTask(s *storage.Storage) {
 	if s.ActiveTask == nil {
 		fmt.Println("No active task to reset.")
