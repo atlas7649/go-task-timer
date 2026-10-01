@@ -757,3 +757,44 @@ func PrintTags(s *storage.Storage) {
 		fmt.Printf("%-20s %s\n", tt.tag, formatDuration(tt.time))
 	}
 }
+
+func PrintHistory(startDateStr, endDateStr string, s *storage.Storage) {
+	start, err := time.Parse("2006-01-02", startDateStr)
+	if err != nil {
+		fmt.Printf("Invalid start date format: %v. Please use YYYY-MM-DD.\n", err)
+		return
+	}
+	end, err := time.Parse("2006-01-02", endDateStr)
+	if err != nil {
+		fmt.Printf("Invalid end date format: %v. Please use YYYY-MM-DD.\n", err)
+		return
+	}
+	end = end.AddDate(0, 0, 1)
+
+	fmt.Printf("History from %s to %s:\n", startDateStr, endDateStr)
+	fmt.Println("--------------------------")
+	
+	var filtered []storage.Task
+	for _, t := range s.CompletedTasks {
+		if (t.StartTime.After(start) || t.StartTime.Equal(start)) && t.StartTime.Before(end) {
+			filtered = append(filtered, t)
+		}
+	}
+
+	sort.Slice(filtered, func(i, j int) bool {
+		return filtered[i].StartTime.After(filtered[j].StartTime)
+	})
+
+	if len(filtered) == 0 {
+		fmt.Println("No tasks found in this date range.")
+		return
+	}
+
+	for i, t := range filtered {
+		tagStr := ""
+		if t.Tag != "" {
+			tagStr = fmt.Sprintf(" [%s]", t.Tag)
+		}
+		fmt.Printf("%d: %s%s: %s (Started: %s)\n", i, t.Name, tagStr, formatDuration(t.Duration), t.StartTime.Format("2006-01-02 15:04"))
+	}
+}

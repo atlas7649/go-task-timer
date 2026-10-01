@@ -11,7 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | clear | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | search <query> | stats | tag <tag> | tags | goal <name> <duration> | goals | rm-goal <name> | daily | weekly]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | clear | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | search <query> | stats | tag <tag> | tags | goal <name> <duration> | goals | rm-goal <name> | daily | weekly | history <start_date> <end_date>]")
 		os.Exit(1)
 	}
 
@@ -149,6 +149,12 @@ func main() {
 		timer.PrintDailyReport(store)
 	case "weekly":
 		timer.PrintWeeklyReport(store)
+	case "history":
+		if len(os.Args) < 4 {
+			fmt.Println("Usage: history <start_date> <end_date> (YYYY-MM-DD)")
+			return
+		}
+		timer.PrintHistory(os.Args[2], os.Args[3], store)
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 	}
