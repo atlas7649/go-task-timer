@@ -11,7 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | clear | reset | status | delete <index> | top | top-tag | search <query> | stats | tag <tag> | goal <name> <duration> | goals | rm-goal <name> | daily | weekly]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | clear | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | search <query> | stats | tag <tag> | goal <name> <duration> | goals | rm-goal <name> | daily | weekly]")
 		os.Exit(1)
 	}
 
@@ -92,6 +92,18 @@ func main() {
 			return
 		}
 		timer.DeleteTask(index, store)
+	case "edit":
+		if len(os.Args) < 5 {
+			fmt.Println("Usage: edit <index> <new_name> <new_tag>")
+			return
+		}
+		var index int
+		_, err := fmt.Sscanf(os.Args[2], "%d", &index)
+		if err != nil {
+			fmt.Println("Invalid index provided.")
+			return
+		}
+		timer.EditTask(index, os.Args[3], os.Args[4], store)
 	case "top":
 		timer.PrintTopTasks(store)
 	case "top-tag":

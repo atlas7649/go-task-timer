@@ -367,6 +367,19 @@ func DeleteTask(index int, s *storage.Storage) {
 	fmt.Printf("Deleted task '%s' at index %d.\n", taskName, index)
 }
 
+func EditTask(index int, newName string, newTag string, s *storage.Storage) {
+	if index < 0 || index >= len(s.CompletedTasks) {
+		fmt.Println("Invalid task index.")
+		return
+	}
+
+	oldName := s.CompletedTasks[index].Name
+	s.CompletedTasks[index].Name = newName
+	s.CompletedTasks[index].Tag = newTag
+	s.Save()
+	fmt.Printf("Updated task %d: '%s' -> '%s' [%s]\n", index, oldName, newName, newTag)
+}
+
 func PrintStatus(s *storage.Storage) {
 	if s.ActiveTask == nil {
 		fmt.Println("No task is currently running.")
