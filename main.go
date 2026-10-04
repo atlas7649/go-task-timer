@@ -11,7 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | export-json <filename> | clear | clear-goals | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | top-daily | top-week | search <query> | stats | tag <tag> | tags | goal <name> <duration> | goals | rm-goal <name> | daily | weekly | history <start_date> <end_date> | archive | pomodoro [name]]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | export-json <filename> | clear | clear-goals | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | top-daily | top-week | search <query> | stats | tag <tag> | tags | goal <name> <duration> | goals | rm-goal <name> | daily | weekly | history <start_date> <end_date> | archive | pomodoro [name] [duration]]")
 		os.Exit(1)
 	}
 
@@ -175,7 +175,16 @@ func main() {
 		if len(os.Args) >= 3 {
 			name = os.Args[2]
 		}
-		timer.StartPomodoro(name, store)
+		var duration time.Duration = 25 * time.Minute
+		if len(os.Args) >= 4 {
+			var err error
+			duration, err = parseDuration(os.Args[3])
+			if err != nil {
+				fmt.Printf("Invalid pomodoro duration: %v. Using default 25m.\n", err)
+				duration = 25 * time.Minute
+			}
+		}
+		timer.StartPomodoro(name, duration, store)
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 	}

@@ -944,14 +944,13 @@ func ArchiveTasks(s *storage.Storage) {
 	fmt.Printf("Successfully archived %d tasks to %s\n", len(archiveStore.CompletedTasks)-len(s.CompletedTasks), archivePath)
 }
 
-func StartPomodoro(name string, s *storage.Storage) {
-	const pomodoroDuration = 25 * time.Minute
-	fmt.Printf("Starting Pomodoro session for '%s' (25 minutes)...\n", name)
+func StartPomodoro(name string, duration time.Duration, s *storage.Storage) {
+	fmt.Printf("Starting Pomodoro session for '%s' (%s)...\n", name, formatDuration(duration))
 	
 	// Start the task in the storage system
 	StartTask(name, "Pomodoro", s)
 
-	timer := time.NewTimer(pomodoroDuration)
+	timer := time.NewTimer(duration)
 	
 	fmt.Println("Focus! I'll notify you when the time is up.")
 
@@ -962,4 +961,5 @@ func StartPomodoro(name string, s *storage.Storage) {
 	
 	fmt.Println("\a") // Bell sound
 	fmt.Printf("Pomodoro finished for '%s'! Take a break.\n", name)
+	fmt.Printf("Session summary: %s tracked.\n", formatDuration(duration))
 }
