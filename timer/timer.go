@@ -820,3 +820,21 @@ func PrintHistory(startDateStr, endDateStr string, s *storage.Storage) {
 		fmt.Printf("%d: %s%s: %s (Started: %s)\n", i, t.Name, tagStr, formatDuration(t.Duration), t.StartTime.Format("2006-01-02 15:04"))
 	}
 }
+
+func ArchiveTasks(s *storage.Storage) {
+	if len(s.CompletedTasks) == 0 {
+		fmt.Println("No completed tasks to archive.")
+		return
+	}
+
+	archivePath := "archive.json"
+	archiveStore := storage.NewJSONStorage(archivePath)
+	
+	archiveStore.CompletedTasks = append(archiveStore.CompletedTasks, s.CompletedTasks...)
+	archiveStore.Save()
+
+	s.CompletedTasks = []storage.Task{}
+	s.Save()
+
+	fmt.Printf("Successfully archived %d tasks to %s\n", len(archiveStore.CompletedTasks)-len(s.CompletedTasks), archivePath)
+}
