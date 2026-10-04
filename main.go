@@ -11,7 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | export-json <filename> | clear | clear-goals | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | top-daily | top-week | search <query> | stats | tag <tag> | tags | goal <name> <duration> | goals | rm-goal <name> | daily | weekly | history <start_date> <end_date> | archive]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | export-json <filename> | clear | clear-goals | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | top-daily | top-week | search <query> | stats | tag <tag> | tags | goal <name> <duration> | goals | rm-goal <name> | daily | weekly | history <start_date> <end_date> | archive | pomodoro [name]]")
 		os.Exit(1)
 	}
 
@@ -170,6 +170,12 @@ func main() {
 		timer.PrintHistory(os.Args[2], os.Args[3], store)
 	case "archive":
 		timer.ArchiveTasks(store)
+	case "pomodoro":
+		name := "Pomodoro"
+		if len(os.Args) >= 3 {
+			name = os.Args[2]
+		}
+		timer.StartPomodoro(name, store)
 	default:
 		fmt.Printf("Unknown command: %s\n", cmd)
 	}
