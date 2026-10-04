@@ -566,6 +566,60 @@ func PrintTopDailyTasks(s *storage.Storage) {
 	}
 }
 
+func PrintTopWeeklyTasks(s *storage.Storage) {
+	now := time.Now()
+	offset := int(now.Weekday()) - 1
+	if offset < 0 {
+		offset = 6 // Sunday
+	}
+	weekStart := now.AddDate(0, 0, -offset)
+	weekStart = time.Date(weekStart.Year(), weekStart.Month(), weekStart.Day(), 0, 0, 0, 0, weekStart.Location())
+
+	totals := make(map[string]time.Duration)
+	for _, t := range s.CompletedTasks {
+		if t.StartTime.After(weekStart) || t.StartTime.Equal(weekStart) {
+			totals[t.Name] += t.Duration
+		}
+	}
+
+	if s.ActiveTask != nil {
+		if s.ActiveTask.StartTime.After(weekStart) || s.ActiveTask.StartTime.Equal(weekStart) {
+			activeDuration := s.Accumulated
+			if s.PausedAt == nil {
+				activeDuration += time.Since(s.ActiveTask.StartTime)
+			}
+			totals[s.ActiveTask.Name] += activeDuration
+		}
+	}
+
+	type taskTime struct {
+		name string
+		time time.Duration
+	}
+	var sorted []taskTime
+	for name, duration := range totals {
+		sorted = append(sorted, taskTime{name, duration})
+	}
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].time > sorted[j].time
+	})
+
+	fmt.Printf("Top Tasks for this Week (starting %s):\n", weekStart.Format("2006-01-02"))
+	fmt.Println("--------------------------")
+	limit := 5
+	if len(sorted) < limit {
+		limit = len(sorted)
+	}
+
+	for i := 0; i < limit; i++ {
+		fmt.Printf("%d. %-20s %s\n", i+1, sorted[i].name, formatDuration(sorted[i].time))
+	}
+
+	if len(sorted) == 0 {
+		fmt.Println("No tasks tracked this week.")
+	}
+}
+
 func SearchTasks(query string, s *storage.Storage) {
 	query = strings.ToLower(query)
 	var results []storage.Task
