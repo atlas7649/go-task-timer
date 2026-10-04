@@ -515,6 +515,57 @@ func PrintTopTags(s *storage.Storage) {
 	}
 }
 
+func PrintTopDailyTasks(s *storage.Storage) {
+	now := time.Now()
+	year, month, day := now.Date()
+
+	totals := make(map[string]time.Duration)
+	for _, t := range s.CompletedTasks {
+		cy, cm, cd := t.StartTime.Date()
+		if cy == year && cm == month && cd == day {
+			totals[t.Name] += t.Duration
+		}
+	}
+
+	if s.ActiveTask != nil {
+		cy, cm, cd := s.ActiveTask.StartTime.Date()
+		if cy == year && cm == month && cd == day {
+			activeDuration := s.Accumulated
+			if s.PausedAt == nil {
+				activeDuration += time.Since(s.ActiveTask.StartTime)
+			}
+			totals[s.ActiveTask.Name] += activeDuration
+		}
+	}
+
+	type taskTime struct {
+		name string
+		time time.Duration
+	}
+	var sorted []taskTime
+	for name, duration := range totals {
+		sorted = append(sorted, taskTime{name, duration})
+	}
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].time > sorted[j].time
+	})
+
+	fmt.Printf("Top Tasks for Today (%s):\n", now.Format("2006-01-02"))
+	fmt.Println("--------------------------")
+	limit := 5
+	if len(sorted) < limit {
+		limit = len(sorted)
+	}
+
+	for i := 0; i < limit; i++ {
+		fmt.Printf("%d. %-20s %s\n", i+1, sorted[i].name, formatDuration(sorted[i].time))
+	}
+
+	if len(sorted) == 0 {
+		fmt.Println("No tasks tracked today.")
+	}
+}
+
 func SearchTasks(query string, s *storage.Storage) {
 	query = strings.ToLower(query)
 	var results []storage.Task
