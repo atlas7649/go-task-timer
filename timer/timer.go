@@ -2,6 +2,7 @@ package timer
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"os"
 	"sort"
@@ -330,6 +331,21 @@ func ExportCSV(s *storage.Storage, filename string, filterTag string) {
 	}
 
 	fmt.Printf("CSV report successfully exported to %s\n", filename)
+}
+
+func ExportJSON(s *storage.Storage, filename string) {
+	data, err := json.MarshalIndent(s, "", "  ")
+	if err != nil {
+		fmt.Printf("Error marshaling storage to JSON: %v\n", err)
+		return
+	}
+
+	err = os.WriteFile(filename, data, 0644)
+	if err != nil {
+		fmt.Printf("Error writing JSON export: %v\n", err)
+		return
+	}
+	fmt.Printf("Full storage state exported to %s\n", filename)
 }
 
 func ClearTasks(s *storage.Storage) {
