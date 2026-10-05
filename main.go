@@ -11,7 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | export-json <filename> | clear | clear-goals | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | top-daily | top-week | search <query> | stats | tag <tag> | tags | goal <name> <duration> | goals | rm-goal <name> | daily | weekly | history <start_date> <end_date> | archive | pomodoro [name] [duration]]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | export-json <filename> | clear | clear-goals | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | top-daily | top-week | top-month | search <query> | stats | tag <tag> | tags | goal <name> <duration> | goals | rm-goal <name> | daily | weekly | history <start_date> <end_date> | archive | pomodoro [name] [duration]]")
 		os.Exit(1)
 	}
 
@@ -121,6 +121,8 @@ func main() {
 		timer.PrintTopDailyTasks(store)
 	case "top-week":
 		timer.PrintTopWeeklyTasks(store)
+	case "top-month":
+		timer.PrintTopMonthlyTasks(store)
 	case "search":
 		if len(os.Args) < 3 {
 			fmt.Println("Please provide a search query.")
