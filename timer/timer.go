@@ -725,7 +725,7 @@ func PrintTopYearlyTasks(s *storage.Storage) {
 	}
 
 	if len(sorted) == 0 {
-		fmt.Println("No tasks tracked this year.")
+		fmt.Println("No tasks recorded yet.")
 	}
 }
 
@@ -1050,7 +1050,7 @@ func ArchiveTasks(s *storage.Storage) {
 	s.CompletedTasks = []storage.Task{}
 	s.Save()
 
-	fmt.Printf("Successfully archived %d tasks to %s\n", len(archiveStore.CompletedTasks)-len(s.CompletedTasks), archivePath)
+	fmt.Printf("Successfully archived %d tasks to %s\n", archiveStore.CompletedTasks)-len(s.CompletedTasks), archivePath)
 }
 
 func StartPomodoro(name string, duration time.Duration, s *storage.Storage) {
@@ -1080,4 +1080,26 @@ func StartPomodoro(name string, duration time.Duration, s *storage.Storage) {
 			fmt.Printf("\rRemaining: %s   ", formatDuration(remaining))
 		}
 	}
+}
+
+func PrintLastTask(s *storage.Storage) {
+	if len(s.CompletedTasks) == 0 {
+		fmt.Println("No completed tasks found.")
+		return
+	}
+
+	// Tasks are appended to the slice, so the last one is the most recent
+	task := s.CompletedTasks[len(s.CompletedTasks)-1]
+	
+	tagStr := ""
+	if task.Tag != "" {
+		tagStr = fmt.Sprintf(" [%s]", task.Tag)
+	}
+
+	fmt.Println("Last Completed Task:")
+	fmt.Println("--------------------------")
+	fmt.Printf("Task:     %s%s\n", task.Name, tagStr)
+	fmt.Printf("Duration: %s\n", formatDuration(task.Duration))
+	fmt.Printf("Started:  %s\n", task.StartTime.Format("2006-01-02 15:04"))
+	fmt.Printf("Stopped:  %s\n", task.EndTime.Format("2006-01-02 15:04"))
 }
