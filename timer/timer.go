@@ -1150,3 +1150,44 @@ func PrintTopPomodoroTasks(s *storage.Storage) {
 		fmt.Println("No Pomodoro sessions recorded yet.")
 	}
 }
+
+func PrintTopPomodoroCount(s *storage.Storage) {
+	counts := make(map[string]int)
+	for _, t := range s.CompletedTasks {
+		if t.Tag == "Pomodoro" {
+			counts[t.Name]++
+		}
+	}
+
+	type taskCount struct {
+		name  string
+		count int
+	}
+
+	var sorted []taskCount
+	for name, count := range counts {
+		sorted = append(sorted, taskCount{name, count})
+	}
+
+	sort.Slice(sorted, func(i, j int) bool {
+		if sorted[i].count == sorted[j].count {
+			return sorted[i].name < sorted[j].name
+		}
+		return sorted[i].count > sorted[j].count
+	})
+
+	fmt.Println("Top Pomodoro Sessions (by Frequency):")
+	fmt.Println("--------------------------")
+	limit := 5
+	if len(sorted) < limit {
+		limit = len(sorted)
+	}
+
+	for i := 0; i < limit; i++ {
+		fmt.Printf("%d. %-20s %d sessions\n", i+1, sorted[i].name, sorted[i].count)
+	}
+
+	if len(sorted) == 0 {
+		fmt.Println("No completed Pomodoro sessions recorded yet.")
+	}
+}
