@@ -1059,16 +1059,25 @@ func StartPomodoro(name string, duration time.Duration, s *storage.Storage) {
 	// Start the task in the storage system
 	StartTask(name, "Pomodoro", s)
 
-	timer := time.NewTimer(duration)
-	
 	fmt.Println("Focus! I'll notify you when the time is up.")
+	
+	deadline := time.Now().Add(duration)
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
 
-	<-timer.C
-	
-	// Stop the task automatically when pomodoro ends
-	StopTask(s)
-	
-	fmt.Println("\a") // Bell sound
-	fmt.Printf("Pomodoro finished for '%s'! Take a break.\n", name)
-	fmt.Printf("Session summary: %s tracked.\n", formatDuration(duration))
+	for {
+		select {
+		case <-ticker.C:
+			remaining := time.Until(deadline)
+			if remaining <= 0 {
+				fmt.Printf("\rTime's up!           \n")
+				StopTask(s)
+				fmt.Println("\a") // Bell sound
+				fmt.Printf("Pomodoro finished for '%s'! Take a break.\n", name)
+				fmt.Printf("Session summary: %s tracked.\n", formatDuration(duration))
+				return
+			}
+			fmt.Printf("\rRemaining: %s   ", formatDuration(remaining))
+		}
+	}
 }
