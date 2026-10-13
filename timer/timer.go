@@ -12,6 +12,9 @@ import (
 )
 
 func formatDuration(d time.Duration) string {
+	if d == 0 {
+		return "0s"
+	}
 	h := int(d.Hours())
 	m := int(d.Minutes()) % 60
 	s := int(d.Seconds()) % 60
@@ -426,6 +429,10 @@ func PrintStatus(s *storage.Storage) {
 }
 
 func PrintTopTasks(s *storage.Storage) {
+	PrintTopAllTasks(s)
+}
+
+func PrintTopAllTasks(s *storage.Storage) {
 	totals := make(map[string]time.Duration)
 	for _, t := range s.CompletedTasks {
 		totals[t.Name] += t.Duration
@@ -453,7 +460,7 @@ func PrintTopTasks(s *storage.Storage) {
 		return sorted[i].time > sorted[j].time
 	})
 
-	fmt.Println("Top 5 Tasks by Duration:")
+	fmt.Println("Top 5 Tasks (All Time):")
 	fmt.Println("--------------------------")
 	limit := 5
 	if len(sorted) < limit {
