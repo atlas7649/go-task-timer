@@ -1041,6 +1041,7 @@ func ArchiveTasks(s *storage.Storage) {
 		return
 	}
 
+	count := len(s.CompletedTasks)
 	archivePath := "archive.json"
 	archiveStore := storage.NewJSONStorage(archivePath)
 	
@@ -1050,7 +1051,7 @@ func ArchiveTasks(s *storage.Storage) {
 	s.CompletedTasks = []storage.Task{}
 	s.Save()
 
-	fmt.Printf("Successfully archived %d tasks to %s\n", archiveStore.CompletedTasks)-len(s.CompletedTasks), archivePath)
+	fmt.Printf("Successfully archived %d tasks to %s\n", count, archivePath)
 }
 
 func StartPomodoro(name string, duration time.Duration, s *storage.Storage) {
