@@ -37,7 +37,11 @@ func main() {
 	case "stop":
 		timer.StopTask(store)
 	case "stop-all":
-		timer.StopTask(store)
+		if store.ActiveTask == nil {
+			fmt.Println("No active task to stop.")
+		} else {
+			timer.StopTask(store)
+		}
 	case "list":
 		timer.ListTasks(store)
 	case "log":
