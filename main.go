@@ -11,7 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | stop-all | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | export-json <filename> | clear | clear-goals | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag | top-daily | top-week | top-month | top-yearly | top-all | top-pomodoro | top-pomodoro-count | search <query> | stats | tag <tag> | tags | goal <name> <duration> | goals | rm-goal <name> | daily | weekly | history <start_date> <end_date> | archive | pomodoro [name] [duration] | last]")
+		fmt.Println("Usage: task-timer [start <name> [tag] | pause | resume | stop | stop-all | list | log | summary [name] | report [tag] | export <filename> [tag] | export-csv <filename> [tag] | export-json <filename> | clear | clear-goals | reset | status | delete <index> | edit <index> <name> <tag> | top | top-tag-duration | top-daily | top-week | top-month | top-yearly | top-all | top-pomodoro | top-pomodoro-count | search <query> | stats | tag <tag> | tags | goal <name> <duration> | goals | rm-goal <name> | daily | weekly | history <start_date> <end_date> | archive | pomodoro [name] [duration] | last]")
 		os.Exit(1)
 	}
 
@@ -117,7 +117,7 @@ func main() {
 		timer.EditTask(index, os.Args[3], os.Args[4], store)
 	case "top":
 		timer.PrintTopTasks(store)
-	case "top-tag":
+	case "top-tag-duration":
 		timer.PrintTopTags(store)
 	case "top-daily":
 		timer.PrintTopDailyTasks(store)
