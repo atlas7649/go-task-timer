@@ -575,9 +575,10 @@ func PrintTopDailyTasks(s *storage.Storage) {
 
 func PrintTopWeeklyTasks(s *storage.Storage) {
 	now := time.Now()
-	offset := int(now.Weekday()) - 1
-	if offset < 0 {
-		offset = 6 // Sunday
+	// Calculate the start of the current week (Monday)
+	offset := int(now.Weekday())
+	if offset == 0 { // Sunday
+		offset = 6
 	}
 	weekStart := now.AddDate(0, 0, -offset)
 	weekStart = time.Date(weekStart.Year(), weekStart.Month(), weekStart.Day(), 0, 0, 0, 0, weekStart.Location())
@@ -899,9 +900,9 @@ func PrintDailyReport(s *storage.Storage) {
 func PrintWeeklyReport(s *storage.Storage) {
 	now := time.Now()
 	// Calculate the start of the current week (Monday)
-	offset := int(now.Weekday()) - 1
-	if offset < 0 {
-		offset = 6 // Sunday
+	offset := int(now.Weekday())
+	if offset == 0 { // Sunday
+		offset = 6
 	}
 	weekStart := now.AddDate(0, 0, -offset)
 	weekStart = time.Date(weekStart.Year(), weekStart.Month(), weekStart.Day(), 0, 0, 0, 0, weekStart.Location())
@@ -987,8 +988,7 @@ func PrintTags(s *storage.Storage) {
 		return sorted[i].tag < sorted[j].tag
 	})
 
-	fmt.Println("Unique Tags & Total Time:
-")
+	fmt.Println("Unique Tags & Total Time:\n")
 	fmt.Println("--------------------------")
 	for _, tt := range sorted {
 		fmt.Printf("%-20s %s\n", tt.tag, formatDuration(tt.time))
@@ -1095,7 +1095,7 @@ func PrintLastTask(s *storage.Storage) {
 	
 	tagStr := ""
 	if task.Tag != "" {
-			tagStr = fmt.Sprintf(" [%s]", task.Tag)
+		tagStr = fmt.Sprintf(" [%s]", task.Tag)
 	}
 
 	fmt.Println("Last Completed Task:")
