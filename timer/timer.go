@@ -987,7 +987,8 @@ func PrintTags(s *storage.Storage) {
 		return sorted[i].tag < sorted[j].tag
 	})
 
-	fmt.Println("Unique Tags & Total Time:")
+	fmt.Println("Unique Tags & Total Time:
+")
 	fmt.Println("--------------------------")
 	for _, tt := range sorted {
 		fmt.Printf("%-20s %s\n", tt.tag, formatDuration(tt.time))
