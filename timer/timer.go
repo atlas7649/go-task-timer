@@ -527,10 +527,12 @@ func PrintTopDailyTasks(s *storage.Storage) {
 	year, month, day := now.Date()
 
 	totals := make(map[string]time.Duration)
+	var totalDayDuration time.Duration
 	for _, t := range s.CompletedTasks {
 		cy, cm, cd := t.StartTime.Date()
 		if cy == year && cm == month && cd == day {
 			totals[t.Name] += t.Duration
+			totalDayDuration += t.Duration
 		}
 	}
 
@@ -542,6 +544,7 @@ func PrintTopDailyTasks(s *storage.Storage) {
 				activeDuration += time.Since(s.ActiveTask.StartTime)
 			}
 			totals[s.ActiveTask.Name] += activeDuration
+			totalDayDuration += activeDuration
 		}
 	}
 
@@ -570,6 +573,9 @@ func PrintTopDailyTasks(s *storage.Storage) {
 
 	if len(sorted) == 0 {
 		fmt.Println("No tasks tracked today.")
+	} else {
+		fmt.Println("--------------------------")
+		fmt.Printf("Total for today: %s\n", formatDuration(totalDayDuration))
 	}
 }
 
