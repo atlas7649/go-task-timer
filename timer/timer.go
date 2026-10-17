@@ -985,6 +985,7 @@ func PrintTags(s *storage.Storage) {
 		tag  string
 		time time.Duration
 	}
+
 	var sorted []tagTime
 	for tag, duration := range totals {
 		sorted = append(sorted, tagTime{tag, duration})
