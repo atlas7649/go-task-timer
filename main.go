@@ -210,8 +210,5 @@ func main() {
 
 func parseDuration(s string) (time.Duration, error) {
 	s = strings.ToLower(strings.TrimSpace(s))
-	// time.ParseDuration handles suffixes like 'h', 'm', 's' but requires them.
-	// If the user provides just a number, we could assume minutes or seconds, 
-	// but the current requirement is focused on suffix-based input.
 	return time.ParseDuration(s)
 }
