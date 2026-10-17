@@ -17,6 +17,7 @@ A simple CLI tool to track time spent on various tasks.
 - `go run main.go goals` - Show progress on all goals
 - `go run main.go top-daily` - Show top tasks for today
 - `go run main.go top-week` - Show top tasks for this week
+- `go run main.go top-week-duration` - Show top tasks for this week by duration
 - `go run main.go top-month` - Show top tasks for this month
 - `go run main.go top-yearly` - Show top tasks for this year
 - `go run main.go top-all` - Show top tasks of all time
