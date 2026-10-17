@@ -21,4 +21,5 @@ A simple CLI tool to track time spent on various tasks.
 - `go run main.go top-month` - Show top tasks for this month
 - `go run main.go top-yearly` - Show top tasks for this year
 - `go run main.go top-all` - Show top tasks of all time
+- `go run main.go top-all-duration` - Show top tasks of all time by duration
 - `go run main.go top-tag-duration` - Show top tags by duration

@@ -38,6 +38,7 @@ func main() {
 		fmt.Println("  top-month           - Top tasks this month")
 		fmt.Println("  top-yearly          - Top tasks this year")
 		fmt.Println("  top-all             - Top tasks of all time")
+		fmt.Println("  top-all-duration    - Top tasks of all time by duration")
 		fmt.Println("  top-pomodoro        - Top Pomodoro tasks")
 		fmt.Println("  search <query>       - Search tasks by name/tag")
 		fmt.Println("  stats               - Overall statistics")
@@ -176,6 +177,8 @@ func main() {
 	case "top-yearly":
 		timer.PrintTopYearlyTasks(store)
 	case "top-all":
+		timer.PrintTopAllTasks(store)
+	case "top-all-duration":
 		timer.PrintTopAllTasks(store)
 	case "top-pomodoro":
 		timer.PrintTopPomodoroTasks(store)
