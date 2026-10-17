@@ -209,30 +209,9 @@ func main() {
 }
 
 func parseDuration(s string) (time.Duration, error) {
-	s = strings.ToLower(s)
-	if strings.HasSuffix(s, "h") {
-		var h int
-		_, err := fmt.Sscanf(s, "%dh", &h)
-		if err != nil {
-			return 0, err
-		}
-		return time.Duration(h) * time.Hour, nil
-	}
-	if strings.HasSuffix(s, "m") {
-		var m int
-		_, err := fmt.Sscanf(s, "%dm", &m)
-		if err != nil {
-			return 0, err
-		}
-		return time.Duration(m) * time.Minute, nil
-	}
-	if strings.HasSuffix(s, "s") {
-		var sVal int
-		_, err := fmt.Sscanf(s, "%ds", &sVal)
-		if err != nil {
-			return 0, err
-		}
-		return time.Duration(sVal) * time.Second, nil
-	}
+	s = strings.ToLower(strings.TrimSpace(s))
+	// time.ParseDuration handles suffixes like 'h', 'm', 's' but requires them.
+	// If the user provides just a number, we could assume minutes or seconds, 
+	// but the current requirement is focused on suffix-based input.
 	return time.ParseDuration(s)
 }
