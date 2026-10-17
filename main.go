@@ -125,6 +125,8 @@ func main() {
 		timer.PrintTopTags(store)
 	case "top-daily":
 		timer.PrintTopDailyTasks(store)
+	case "top-daily-duration":
+		timer.PrintTopDailyTasks(store)
 	case "top-week":
 		timer.PrintTopWeeklyTasks(store)
 	case "top-week-duration":
